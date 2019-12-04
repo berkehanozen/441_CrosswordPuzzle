@@ -1,0 +1,19 @@
+.root{
+    -fx-font-size: 3em;
+    -fx-font-weight: bolder;
+}
+
+.text-field:disabled{
+    -fx-opacity: 1;
+}
+
+.button{
+    -fx-min-width: 150px;
+    -fx-min-height: 20px;
+    -fx-font-size: 12pt;
+}
+.combo-box{
+    -fx-min-width: 150px;
+    -fx-min-height: 20px;
+    -fx-font-size: 12pt;
+}
