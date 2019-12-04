@@ -92,9 +92,11 @@ public class Main extends Application {
                 }
                 System.out.println();
             }
-            DynamicSlotTable dst = new DynamicSlotTable();
-            dst.setUpTable(grid);
-            dst.display();
+            LookAhead la = new LookAhead(grid);
+            la.firstStep();
+            la.display();
+            la.secondStep();
+            la.display();
         });
         sizeTextField = new TextField();
         sizeTextField.setAlignment(Pos.CENTER);
@@ -121,7 +123,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public void createGrid(){
+    public void createGrid(){ // 2.harfi f yada t olan hiçbir 3 harflik kelime yok
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         for (int i = 0; i < gridSize; i++) {

@@ -8,8 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class DynamicSlotTable {
@@ -20,8 +18,15 @@ public class DynamicSlotTable {
     private ArrayList<Node> table = new ArrayList<>();
     private ArrayList<String> wordList = new ArrayList<>();
 
+    public ArrayList<String> getWordList() {
+        return wordList;
+    }
 
-    public void setUpTable(String [][] grid){
+    public void setWordList(ArrayList<String> wordList) {
+        this.wordList = wordList;
+    }
+
+    public DynamicSlotTable(String [][] grid){
         int length = 0;
         int begin = 0;
         boolean didBegin = false;
@@ -110,7 +115,7 @@ public class DynamicSlotTable {
                     length++;
                 }
                 else if(grid[i][j].equals("*")){
-                    if(didBegin && length > 1) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
+                    if(didBegin && length > 2) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
                         end = begin + length - 1;
                         table.add(createNode(begin, j, VERTICAL, length));
                         wordList.add(word);
@@ -123,57 +128,19 @@ public class DynamicSlotTable {
                 }
             }
         }
-        findFittingWords();
     }
 
-    public void findFittingWords(){
-        File jsonFile = getFileFromResources("words_6000.json");
-        JSONArray jsonArray = null;
-        try {
-            jsonArray = new JSONArray(new JSONTokener(new FileInputStream(jsonFile)));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        for(int i = 0; i < table.size(); i++) {
-            ArrayList<String> words = new ArrayList<>();
-            for (int j = 0; j < jsonArray.length(); j++) {
-                String jThWord = jsonArray.getJSONObject(j).getString("kelime");
-                if(jThWord.length() == table.get(i).wordLength){
-                    if(Pattern.matches(wordList.get(i), jThWord.toUpperCase()))
-                        words.add(jThWord);
-                }
-            }
-            table.get(i).setWords(words);
-            table.get(i).setWordSize(words.size());
-        }
-
+    public void add(Node n){
+        table.add(n);
     }
 
-    public void display(){
-        //Object[] array = table.toArray();
-        for (int i = 0; i < table.size(); i++){
-            Node n = table.get(i);
-            String orientation = n.getOrientation() == 0 ? "H" : "V";
-            System.out.println(n.getRow()+ ", "+n.getColumn()+ ", "+orientation+ ", "+n.getWordLength()+", "+wordList.get(i));
-            for(int j = 0; j < table.get(i).getWords().size(); j++){
-                System.out.println(table.get(i).getWords().get(j));
-            }
-            System.out.println("--------------------------------------------------");
-        }
+    public int size(){
+        return table.size();
     }
 
-    private File getFileFromResources(String fileName) {
-
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("file is not found!");
-        } else {
-            return new File(resource.getFile());
-        }
-
+    public Node get(int i){
+        return table.get(i);
     }
 
 
