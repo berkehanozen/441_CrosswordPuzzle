@@ -1,6 +1,7 @@
 package crosswordapp;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.geometry.HPos;
@@ -37,7 +38,6 @@ public class Main extends Application {
     @Override
     public void start(Stage stg) throws Exception{
         primaryStage = stg;
-
         vBox = new VBox(20);
         vBox.setPadding(new Insets(50,0,0,0));
         vBox.setAlignment(Pos.CENTER);
@@ -47,7 +47,7 @@ public class Main extends Application {
         cc = new ColumnConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true );
         rc = new RowConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true );
 
-        createGrid();
+        createGrid(null,null);
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(scene);
         Button setSize = new Button("Set Size");
@@ -97,6 +97,7 @@ public class Main extends Application {
             la.display();
             la.thirdStep();
             la.display();
+            createGrid(grid.clone(),grid);   //yeni grid verilecek parametre olarak.
             System.out.println(la.fourthStep(null, 1));
             la.gridWord();
         });
@@ -117,7 +118,7 @@ public class Main extends Application {
                 return;
             }
             gridSize = size;
-            createGrid();
+            createGrid(null, null);
         });
         vBox.getChildren().addAll(sizeTextField,setSize,insertMode,finish);
         primaryStage.setMinWidth(800);
@@ -125,7 +126,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public void createGrid(){ // 2.harfi f yada t olan hiçbir 3 harflik kelime yok
+    public void createGrid(String[][] grid, String[][] origGrid){ // 2.harfi f yada t olan hiçbir 3 harflik kelime yok
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         for (int i = 0; i < gridSize; i++) {
@@ -134,22 +135,31 @@ public class Main extends Application {
         }
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-
                 TextField text = new TextField();
-                text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
-                text.setAlignment(Pos.CENTER);
-                text.textProperty().addListener( (observable, oldValue, newValue) -> {
-                    if (newValue.length()!= 0) {
-                        if (!Character.isLetter(text.getText().charAt(0))) {
-                            text.setText("");
-                        }else{
-                            text.setText(newValue.substring(newValue.length() - 1).toUpperCase());
-                        }
-                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-display-caret: false;");
+                if(grid!=null && grid[i][j].charAt(0)!='*' && grid[i][j].charAt(0)!=' ') {
+                    text.setText(grid[i][j]);
+                    if(origGrid!=null && !origGrid[i][j].equals(grid[i][j])) {
+                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: red;");
                     }else{
                         text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
                     }
-//                    text.fontProperty().bind(gridPane.widthProperty().);
+                }else{
+                    text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+                }
+                text.setAlignment(Pos.CENTER);
+                text.textProperty().addListener( (observable, oldValue, newValue) -> {
+                    Platform.runLater(() -> {
+                        if (newValue.length()!= 0) {
+                            if (!Character.isLetter(text.getText().charAt(0))) {
+                                text.setText("");
+                            }else{
+                                text.setText(newValue.substring(newValue.length() - 1).toUpperCase());
+                            }
+                            text.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-display-caret: false;");
+                        }else{
+                            text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+                        }
+                    });
                 });
                 Rectangle tile = new Rectangle(0, 0);
 
