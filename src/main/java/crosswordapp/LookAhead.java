@@ -8,19 +8,33 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class LookAhead {
 
-    public static int HORIZONTAL = 0;
-    public static int VERTICAL = 1;
+    public static final int HORIZONTAL = 0;
+    public static final int VERTICAL = 1;
+
+    public String[][] grid;
+    public int gridSize;
 
     private DynamicSlotTable table;
     private ArrayList<String> wordList;
     private ArrayList<String> gridWords = new ArrayList<>();
+    private ArrayList<String> gridLocation = new ArrayList<>();
 
     public LookAhead(String[][] grid) {
         table = new DynamicSlotTable(grid);
+        this.grid = new String[grid.length][grid.length];
+        for(int i = 0; i < grid.length; i++){
+            for (int j = 0; j < grid[i].length ; j++) {
+                this.grid[i][j] = grid[i][j];
+            }
+        }
+        gridSize = grid.length;
         wordList = table.getWordList();
     }
 
@@ -160,6 +174,7 @@ public class LookAhead {
         if(dst.size() == 1){
             if(dst.get(0).getWordSize() > 0){
                 gridWords.add(dst.get(0).getWords().get(0));
+                gridLocation.add(dst.get(0).getRow()+" "+dst.get(0).getColumn()+" "+dst.get(0).getOrientation());
                 return true;
             }
         }
@@ -182,9 +197,10 @@ public class LookAhead {
             String s = wordsOfN.get(0);
             addWord(n, s, table2);
             table = table2;
-            thirdStep();
+            thirdStep();  //Forward Checking
             if(fourthStep(table2, 0)) {
                 gridWords.add(s);
+                gridLocation.add(n.getRow()+" "+n.getColumn()+" "+n.getOrientation());
                 return true;
             }
             wordsOfN.remove(s);
@@ -192,9 +208,33 @@ public class LookAhead {
         return false;
     }
 
-    public void gridWord(){
-        for(int i = 0; i < gridWords.size(); i++)
-            System.out.println(gridWords.get(i));
+    public String[][] gridWord(){
+//        for(int i = 0; i < gridWords.size(); i++)
+//            System.out.println(gridWords.get(i));
+        if(gridWords.size()!=0){
+            for(int i = 0; i < grid.length; i++){   //fill it with stars
+                for(int j = 0; j < grid[i].length; j++){
+                    grid[i][j] = "*";
+                }
+            }
+            for(int i = 0; i < gridWords.size(); i++){
+               String[] location = gridLocation.get(i).split(" ");
+               int row = Integer.parseInt(location[0]);
+               int column = Integer.parseInt(location[1]);
+               char[] word = gridWords.get(i).toUpperCase(new Locale("tr", "TR")).toCharArray();
+               int wordIndex = 0;
+               if(Integer.parseInt(location[2]) == HORIZONTAL){
+                   for (int j = 0; j < word.length; j++) {
+                       grid[row][column+j] = Character.toString(word[wordIndex++]);
+                   }
+               }else{
+                   for (int j = 0; j < word.length; j++) {
+                       grid[row+j][column] = Character.toString(word[wordIndex++]);
+                   }
+               }
+            }
+        }
+        return grid;
     }
 
     public void addWord(DynamicSlotTable.Node n, String s, DynamicSlotTable dst){

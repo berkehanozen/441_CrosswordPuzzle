@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,6 +36,8 @@ public class Main extends Application {
     private RowConstraints rc;
     private Scene scene;
     private TextField sizeTextField;
+    private Label timeLabel;
+    private Label solnLabel;
 
     @Override
     public void start(Stage stg) throws Exception{
@@ -41,13 +45,14 @@ public class Main extends Application {
         vBox = new VBox(20);
         vBox.setPadding(new Insets(50,0,0,0));
         vBox.setAlignment(Pos.CENTER);
+        timeLabel = new Label();
+        solnLabel = new Label();
         borderPane = new BorderPane(null,null,vBox,null,null);
         scene = new Scene(borderPane, 600, 600);
         scene.getStylesheets().add("styles.css");
         cc = new ColumnConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true );
         rc = new RowConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true );
 
-        createGrid(null,null);
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(scene);
         Button setSize = new Button("Set Size");
@@ -65,6 +70,7 @@ public class Main extends Application {
                 }
             }
         });
+        createGrid(null,null);
         Button finish = new Button("Finish");
         finish.setOnMouseClicked(e -> {     // * -> siyah kare, " " (boşluk) -> boş kutu, <char> -> dolu kutu
             String grid[][] = new String[gridSize][gridSize];
@@ -92,12 +98,16 @@ public class Main extends Application {
                 }
                 System.out.println();
             }
+            long start = System.currentTimeMillis();
             LookAhead la = new LookAhead(grid);
             la.firstStep();
-            la.thirdStep();
+            la.thirdStep();   //Forward Checking
             //createGrid(grid.clone(),grid);   //yeni grid verilecek parametre olarak.
-            System.out.println(la.fourthStep(null, 1));
-            la.gridWord();
+            solnLabel.setText(la.fourthStep(null, 1) ? "Solution Found" : "Solution Not Found");
+            double time = (System.currentTimeMillis() - start) /1000.0;
+            timeLabel.setText("It took "+ time+ " seconds!");
+            System.out.println("finished");
+            createGrid(la.gridWord(),grid);
         });
         sizeTextField = new TextField();
         sizeTextField.setAlignment(Pos.CENTER);
@@ -118,7 +128,7 @@ public class Main extends Application {
             gridSize = size;
             createGrid(null, null);
         });
-        vBox.getChildren().addAll(sizeTextField,setSize,insertMode,finish);
+        vBox.getChildren().addAll(new Label("With forward checking,"),timeLabel,solnLabel,sizeTextField,setSize,insertMode,finish);
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         primaryStage.show();
@@ -134,12 +144,13 @@ public class Main extends Application {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 TextField text = new TextField();
+                Rectangle tile = new Rectangle(0, 0);
                 if(grid!=null && grid[i][j].charAt(0)!='*' && grid[i][j].charAt(0)!=' ') {
                     text.setText(grid[i][j]);
                     if(origGrid!=null && !origGrid[i][j].equals(grid[i][j])) {
-                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: red;");
+                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-display-caret: false;");
                     }else{
-                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+                        text.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-display-caret: false;");
                     }
                 }else{
                     text.setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
@@ -159,9 +170,11 @@ public class Main extends Application {
                         }
                     });
                 });
-                Rectangle tile = new Rectangle(0, 0);
-
-                tile.setFill(Color.WHITE);
+                if(grid!=null && grid[i][j].charAt(0)!=' ' && !Character.isLetter(grid[i][j].charAt(0))){
+                    tile.setFill(Color.BLACK);
+                }else{
+                    tile.setFill(Color.WHITE);
+                }
                 tile.setStroke(Color.BLACK);
                 tile.setOnMouseClicked(e -> {
                     if(insertMode.getValue().equals(INSERT_MODE_BLACK)){
@@ -172,6 +185,7 @@ public class Main extends Application {
                         }
                     }
                 });
+
                 StackPane sp = new StackPane(tile, text);
                 gridPane.add(sp, j, i);
                 tile.widthProperty().bind(gridPane.widthProperty().divide(gridSize));
@@ -182,6 +196,7 @@ public class Main extends Application {
         gridPane.maxWidthProperty().bind(primaryStage.heightProperty().subtract(40));
         gridPane.maxHeightProperty().bind(primaryStage.widthProperty().subtract(vBox.widthProperty()).subtract(40));
         borderPane.setMargin(gridPane, new Insets(20));
+        insertMode.getOnAction().handle(new ActionEvent());
     }
 
 

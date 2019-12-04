@@ -3,6 +3,11 @@
     -fx-font-weight: bolder;
 }
 
+.label{
+    -fx-font-size: 0.5em;
+    -fx-font-weight: bolder;
+}
+
 .text-field:disabled{
     -fx-opacity: 1;
 }
