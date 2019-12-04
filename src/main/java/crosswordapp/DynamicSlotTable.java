@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 public class DynamicSlotTable {
@@ -26,6 +27,8 @@ public class DynamicSlotTable {
         this.wordList = wordList;
     }
 
+    public DynamicSlotTable(){}
+
     public DynamicSlotTable(String [][] grid){
         int length = 0;
         int begin = 0;
@@ -35,7 +38,7 @@ public class DynamicSlotTable {
         for(int i = 0; i < grid.length; i++){
             for(int j = 0; j < grid.length; j++){
                 if(!grid[i][j].equals("*") && j == grid.length - 1){
-                    if(didBegin) {
+                    if(didBegin && length > 1) {
                         length++;
                         table.add(createNode(i, begin, HORIZONTAL, length));
                         if(!grid[i][j].equals(" ")){
@@ -67,7 +70,7 @@ public class DynamicSlotTable {
                     length++;
                 }
                 else if(grid[i][j].equals("*")){
-                    if(didBegin && length > 1) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
+                    if(didBegin && length > 2) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
                         end = begin + length - 1;
                         table.add(createNode(i, begin, HORIZONTAL, length));
                         wordList.add(word);
@@ -83,7 +86,7 @@ public class DynamicSlotTable {
         for(int j = 0; j < grid.length; j++){
             for(int i = 0; i < grid.length; i++){
                 if(!grid[i][j].equals("*") && i == grid.length - 1){
-                    if(didBegin) {
+                    if(didBegin && length > 1) {
                         length++;
                         table.add(createNode(begin, j, VERTICAL, length));
                         if(!grid[i][j].equals(" ")){
@@ -143,6 +146,20 @@ public class DynamicSlotTable {
         return table.get(i);
     }
 
+    public Node remove(int i){
+        return table.remove(i);
+    }
+
+    public void addAll(DynamicSlotTable dst){
+        for (Node n: dst.table) {
+            Node t = createNode(n.getRow(), n.getColumn(), n.getOrientation(), n.getWordLength());
+            t.setWordSize(n.getWordSize());
+            ArrayList<String> words = new ArrayList<>();
+            words.addAll(n.getWords());
+            t.setWords(words);
+            table.add(t);
+        }
+    }
 
     public Node createNode(int row, int column, int orientation, int wordLength){
         return new Node(row, column, orientation, wordLength, 0, null);

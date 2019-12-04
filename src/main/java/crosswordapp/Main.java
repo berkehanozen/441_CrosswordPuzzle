@@ -95,8 +95,10 @@ public class Main extends Application {
             LookAhead la = new LookAhead(grid);
             la.firstStep();
             la.display();
-            la.secondStep();
+            la.thirdStep();
             la.display();
+            System.out.println(la.fourthStep(null, 1));
+            la.gridWord();
         });
         sizeTextField = new TextField();
         sizeTextField.setAlignment(Pos.CENTER);
