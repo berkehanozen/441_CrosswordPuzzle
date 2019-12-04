@@ -92,6 +92,9 @@ public class Main extends Application {
                 }
                 System.out.println();
             }
+            DynamicSlotTable dst = new DynamicSlotTable();
+            dst.setUpTable(grid);
+            dst.display();
         });
         sizeTextField = new TextField();
         sizeTextField.setAlignment(Pos.CENTER);
