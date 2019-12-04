@@ -94,10 +94,8 @@ public class Main extends Application {
             }
             LookAhead la = new LookAhead(grid);
             la.firstStep();
-            la.display();
             la.thirdStep();
-            la.display();
-            createGrid(grid.clone(),grid);   //yeni grid verilecek parametre olarak.
+            //createGrid(grid.clone(),grid);   //yeni grid verilecek parametre olarak.
             System.out.println(la.fourthStep(null, 1));
             la.gridWord();
         });

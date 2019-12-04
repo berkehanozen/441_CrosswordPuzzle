@@ -111,16 +111,16 @@ public class LookAhead {
                         System.out.println("---");*/
                         int index = beginIndex - beginOther;
                         char c = s.charAt(otherIndex - begin);
-                        String search = "";
+                        StringBuilder search = new StringBuilder("");
                         for (int z = 0; z < other.getWordLength(); z++) {
                             if (z != index) {
-                                search = search.concat(".");
+                                search.append(".");
                             } else
-                                search = search.concat("" + c);
+                                search.append("" + c);
                         }
                         int count = 0;
                         for (int t = 0; t < otherWords.size(); t++) {
-                            if (Pattern.matches(search, otherWords.get(t))) {
+                            if (Pattern.matches(search.toString(), otherWords.get(t))) {
                                 count++;
                                 break;
                             }
@@ -164,6 +164,13 @@ public class LookAhead {
             }
         }
         DynamicSlotTable.Node n = dst.get(0);
+        int rmIndex = 0;
+        for(int k = 0; k < dst.size(); k++){
+            if(dst.get(k).getWordSize() < n.getWordSize()) {
+                n = dst.get(k);
+                rmIndex = k;
+            }
+        }
         ArrayList<String> wordsOfN = new ArrayList<>();
         wordsOfN.addAll(n.getWords());
         if(n.getWordSize() == 0)
@@ -171,7 +178,7 @@ public class LookAhead {
         for(int i = 0; i < wordsOfN.size(); i++){
             DynamicSlotTable table2 = new DynamicSlotTable();
             table2.addAll(dst);
-            table2.remove(0);
+            table2.remove(rmIndex);
             String s = wordsOfN.get(0);
             addWord(n, s, table2);
             table = table2;
@@ -230,15 +237,15 @@ public class LookAhead {
             if (otherIndex <= end && otherIndex >= begin && beginOther <= beginIndex && endOther >= beginIndex) {
                 int index = beginIndex - beginOther;
                 char c = s.charAt(otherIndex - begin);
-                String search = "";
+                StringBuilder search = new StringBuilder("");
                 for (int z = 0; z < other.getWordLength(); z++) {
                     if (z != index) {
-                        search = search.concat(".");
+                        search.append(".");
                     } else
-                        search = search.concat("" + c);
+                        search.append(c);
                 }
                 for (int t = 0; t < other.getWordSize(); t++) {
-                    if (!Pattern.matches(search, other.getWords().get(t))) {
+                    if (!Pattern.matches(search.toString(), other.getWords().get(t))) {
                         otherWords.remove(other.getWords().get(t));
                     }
                 }

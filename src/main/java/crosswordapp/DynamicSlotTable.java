@@ -34,7 +34,7 @@ public class DynamicSlotTable {
         int begin = 0;
         boolean didBegin = false;
         int end = 0;
-        String word = "";
+        StringBuilder word = new StringBuilder("");
         for(int i = 0; i < grid.length; i++){
             for(int j = 0; j < grid.length; j++){
                 if(!grid[i][j].equals("*") && j == grid.length - 1){
@@ -42,15 +42,15 @@ public class DynamicSlotTable {
                         length++;
                         table.add(createNode(i, begin, HORIZONTAL, length));
                         if(!grid[i][j].equals(" ")){
-                            word = word.concat(grid[i][j]);
-                            wordList.add(word);
+                            word.append(grid[i][j]);
+                            wordList.add(word.toString());
                         }
                         else{
-                            word = word.concat(".");
-                            wordList.add(word);
+                            word.append(".");
+                            wordList.add(word.toString());
                         }
                     }
-                    word = "";
+                    word.setLength(0);
                     didBegin = false;
                     length = 0;
                     begin = 0;
@@ -62,10 +62,10 @@ public class DynamicSlotTable {
                         begin = j;
                     }
                     if(!grid[i][j].equals(" ")){
-                        word = word.concat(grid[i][j]);
+                        word.append(grid[i][j]);
                     }
                     else{
-                        word = word.concat(".");
+                        word.append(".");
                     }
                     length++;
                 }
@@ -73,9 +73,9 @@ public class DynamicSlotTable {
                     if(didBegin && length > 2) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
                         end = begin + length - 1;
                         table.add(createNode(i, begin, HORIZONTAL, length));
-                        wordList.add(word);
+                        wordList.add(word.toString());
                     }
-                    word = "";
+                    word.setLength(0);
                     didBegin = false;
                     length = 0;
                     begin = 0;
@@ -90,15 +90,15 @@ public class DynamicSlotTable {
                         length++;
                         table.add(createNode(begin, j, VERTICAL, length));
                         if(!grid[i][j].equals(" ")){
-                            word = word.concat(grid[i][j]);
-                            wordList.add(word);
+                            word.append(grid[i][j]);
+                            wordList.add(word.toString());
                         }
                         else{
-                            word = word.concat(".");
-                            wordList.add(word);
+                            word.append(".");
+                            wordList.add(word.toString());
                         }
                     }
-                    word = "";
+                    word.setLength(0);
                     didBegin = false;
                     length = 0;
                     begin = 0;
@@ -110,10 +110,10 @@ public class DynamicSlotTable {
                         begin = i;
                     }
                     if(!grid[i][j].equals(" ")){
-                        word = word.concat(grid[i][j]);
+                        word.append(grid[i][j]);
                     }
                     else{
-                        word = word.concat(".");
+                        word.append(".");
                     }
                     length++;
                 }
@@ -121,9 +121,9 @@ public class DynamicSlotTable {
                     if(didBegin && length > 2) { //Bunu duruma göre büyüktür 2 falan da yapabilirik.
                         end = begin + length - 1;
                         table.add(createNode(begin, j, VERTICAL, length));
-                        wordList.add(word);
+                        wordList.add(word.toString());
                     }
-                    word = "";
+                    word.setLength(0);
                     length = 0;
                     begin = 0;
                     end = 0;
@@ -149,6 +149,8 @@ public class DynamicSlotTable {
     public Node remove(int i){
         return table.remove(i);
     }
+
+    public boolean remove(Node n){ return table.remove(n);}
 
     public void addAll(DynamicSlotTable dst){
         for (Node n: dst.table) {
