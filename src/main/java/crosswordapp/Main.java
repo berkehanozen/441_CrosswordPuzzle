@@ -53,7 +53,7 @@ public class Main extends Application {
         cc = new ColumnConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true );
         rc = new RowConstraints(30, 50, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true );
 
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Crossword Puzzle");
         primaryStage.setScene(scene);
         Button setSize = new Button("Set Size");
         insertMode = new ComboBox<>(FXCollections.observableArrayList(INSERT_MODE_LETTER,INSERT_MODE_BLACK));
